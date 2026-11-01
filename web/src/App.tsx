@@ -10,7 +10,7 @@ import { Wrap } from './sections/Wrap'
 
 const CHAPTERS = [
   ['problem', 'Frame the problem'], ['data', 'Meet the data'], ['explore', 'Explore'], ['features', 'Features'],
-  ['baselines', 'Baselines'], ['models', 'Models'], ['evaluate', 'Evaluate'], ['arena', 'The arena'], ['wrap', 'Takeaways'],
+  ['baselines', 'Baselines'], ['models', 'Models'], ['evaluate', 'Evaluate'], ['arena', 'The arena'], ['wrap', 'Notebook & data'],
 ] as const
 
 function useTheme() {
@@ -45,13 +45,17 @@ export default function App() {
       <div className="topbar"><span>Who wins? · ML guide</span><span style={{ display: 'flex', gap: 8 }}><a className="btn" href="#arena" style={{ textDecoration: 'none', fontSize: 13 }}>Arena</a>{themeBtn}</span></div>
       <div className="shell">
         <nav className="rail" aria-label="Chapters">
-          <div className="rail-title">Who wins?<div className="muted" style={{ fontWeight: 400, fontSize: 12 }}>An ML walkthrough</div></div>
+          <div className="rail-title">Who wins?<div className="muted" style={{ fontWeight: 400, fontSize: 12 }}>An ML walkthrough by Juan Barahona</div></div>
           {CHAPTERS.map(([id, label], i) => (
             <a key={id} href={`#${id}`} className={active === id ? 'active' : ''}>
               <span className="mono">{String(i + 1).padStart(2, '0')}</span>{label}
             </a>
           ))}
-          <div className="rail-foot">{themeBtn}</div>
+          <div className="rail-foot">
+            <a href="https://github.com/elmandalorian-thx/PokemonML/blob/main/notebooks/pokemon_battle_ml.ipynb" target="_blank" rel="noreferrer">Notebook ↗</a>
+            <a href="https://www.kaggle.com/datasets/terminus7/pokemon-challenge" target="_blank" rel="noreferrer">Data on Kaggle ↗</a>
+            {themeBtn}
+          </div>
         </nav>
         <main>
           <Hero />

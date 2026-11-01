@@ -3,6 +3,7 @@
 Trains every model shown in the guide and exports JSON for the web app:
   web/src/data/guide.json      metrics, charts, models (bundled into the app)
   web/public/data/battles.json head-to-head record per matchup (fetched lazily)
+  data/output/submission.csv   Kaggle predictions for tests.csv (local only)
 
 Run:  .venv/Scripts/python.exe ml/build.py
 """
@@ -341,8 +342,6 @@ def main() -> None:
     sub["Winner"] = np.where(tp >= 0.5, tests.First_pokemon, tests.Second_pokemon)
     (ROOT / "data" / "output").mkdir(parents=True, exist_ok=True)
     sub.to_csv(ROOT / "data" / "output" / "submission.csv", index=False)
-    OUT_PUBLIC.mkdir(parents=True, exist_ok=True)
-    sub.to_csv(OUT_PUBLIC / "submission.csv", index=False)  # downloadable from the site
 
     # --- Export models for in-browser inference
     gbm_trees = [export_tree(est[0], FEATURES) for est in gbm.estimators_]

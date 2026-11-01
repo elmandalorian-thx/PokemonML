@@ -12,14 +12,29 @@ Pokémon and the trained model calls the fight, in your browser.
 - Speed ties always go to the *second* Pokémon, which is why swap-augmentation makes models worse.
 - Gradient boosting reaches 95.1%; logistic regression only 88.2% until it gets an "is faster?" feature (94.6%).
 
+**Notebook:** [`notebooks/pokemon_battle_ml.ipynb`](notebooks/pokemon_battle_ml.ipynb)
+([open in Colab](https://colab.research.google.com/github/elmandalorian-thx/PokemonML/blob/main/notebooks/pokemon_battle_ml.ipynb))
+runs the whole project with every step commented and mapped to the matching chapter of the book below.
+
+**Data:** the original Kaggle CSVs are in [`data/raw/`](data/raw) and downloadable from the site.
+
 ## Run it
 
 ```bash
 uv venv .venv && uv pip install --python .venv/Scripts/python.exe -r ml/requirements.txt
-.venv/Scripts/python.exe ml/fetch_data.py   # Kaggle CSVs + PokeAPI id list
-.venv/Scripts/python.exe ml/build.py        # train, evaluate, export JSON + submission.csv
+.venv/Scripts/python.exe ml/fetch_data.py   # PokeAPI id list (add --kaggle to re-download the CSVs)
+.venv/Scripts/python.exe ml/build.py        # train, evaluate, export the site JSON
 cd web && npm install && npm run dev
 ```
+
+## Credits
+
+- **Created by** Juan Barahona ([github.com/elmandalorian-thx](https://github.com/elmandalorian-thx))
+- **Data:** [Pokemon – Weedle's Cave](https://www.kaggle.com/datasets/terminus7/pokemon-challenge) (the "Pokemon Challenge") by
+  T7 – Hackathon Challenge (terminus7) on Kaggle, CC0: Public Domain. This project is built on their dataset and challenge.
+- **Method:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed. (O'Reilly, 2022).
+- **Related reading:** Diego Rosa, ["Your favorite game from a different point of view"](https://towardsdatascience.com/your-favorite-game-from-a-different-point-of-view-93732173adf7/)
+  (Towards Data Science, 2020), which inspired the type radar charts.
 
 Artwork and cries are hot-linked from the open [PokeAPI](https://github.com/PokeAPI) sprite and cry repositories.
 Pokémon and related names are trademarks of Nintendo, Game Freak and The Pokémon Company. Educational, non-commercial project.

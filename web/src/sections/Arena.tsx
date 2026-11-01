@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { DivergingBars } from '../components/charts'
+import { DivergingBars, Legend, Radar } from '../components/charts'
+import { TownBackdrop } from '../components/TownBackdrop'
 import { TreeDiagram } from '../components/TreeDiagram'
 import { Art, Callout, Chapter, PokemonPicker, TYPE_COLORS, Types } from '../components/ui'
 import { fallbackChain, playCry, sprite } from '../lib/assets'
@@ -121,6 +122,7 @@ export function Arena() {
         {lesson && <div className="muted" style={{ fontSize: 14, marginTop: 10 }}>💡 {lesson}</div>}
 
         <div className="stage" style={{ ...tint, marginTop: 16 }}>
+          <TownBackdrop />
           <Fighter p={a} side="A" hp={hp[0]} fx={fx} />
           <div className="vs">
             <div className="vs-badge">VS</div>
@@ -249,16 +251,15 @@ function Verdict({ a, b, pred, outcome, h2h }: {
             </>
           )}
           <div style={{ marginTop: 14 }}>
-            <div className="muted" style={{ fontSize: 13, marginBottom: 8 }}>Stat matchup</div>
-            <div className="butterfly">
-              {a.stats.map((s, i) => {
-                const t = b.stats[i]
-                return [
-                  <div key={`l${i}`} className="l"><span className="tabular" style={{ fontWeight: s > t ? 700 : 400 }}>{s}</span><div className="bar" style={{ width: `${(s / 200) * 100}%`, background: s >= t ? 'var(--series-1)' : 'var(--deemph)', borderRadius: '4px 0 0 4px' }} /></div>,
-                  <div key={`m${i}`} style={{ textAlign: 'center', fontWeight: i === 5 ? 700 : 400 }} className={i === 5 ? '' : 'muted'}>{STAT_SHORT[i]}</div>,
-                  <div key={`r${i}`} className="r"><div className="bar" style={{ width: `${(t / 200) * 100}%`, background: t >= s ? 'var(--series-2)' : 'var(--deemph)', borderRadius: '0 4px 4px 0' }} /><span className="tabular" style={{ fontWeight: t > s ? 700 : 400 }}>{t}</span></div>,
-                ]
-              })}
+            <div className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Stat matchup ({a.name} · {b.name})</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Radar size={290} max={Math.max(150, Math.ceil(Math.max(...a.stats, ...b.stats) / 50) * 50)} axes={STAT_SHORT}
+                axisNote={(i) => `${a.stats[i]} · ${b.stats[i]}`}
+                series={[
+                  { key: 'A', label: a.name, color: 'var(--series-1)', values: a.stats },
+                  { key: 'B', label: b.name, color: 'var(--series-2)', values: b.stats },
+                ]} />
+              <Legend items={[{ label: `A · ${a.name}`, color: 'var(--series-1)' }, { label: `B · ${b.name}`, color: 'var(--series-2)' }]} />
             </div>
           </div>
         </div>

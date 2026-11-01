@@ -4,12 +4,36 @@
   padding: 24px 28px 20px; gap: 12px;
 }
 .stage::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
   background: radial-gradient(ellipse 50% 70% at 18% 78%, var(--tint-a), transparent 70%),
               radial-gradient(ellipse 50% 70% at 82% 78%, var(--tint-b), transparent 70%);
-  opacity: 0.32;
+  opacity: 0.22;
 }
-.fighter { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 1; }
+
+/* ---- town backdrop: day in light mode, dusk in dark mode */
+.stage {
+  --sky-top: #a9d8f5; --sky-bottom: #e6f4fb; --sun: #ffd76a; --cloud: #ffffff; --star-opacity: 0;
+  --hill-far: #b5dcae; --hill-near: #9acf8e; --grass: #8cc97b; --path: #e9d7a8; --path-line: #d5bf88;
+  --fence: #c9a878; --trunk: #8a6a4a; --leaf: #5fae5a; --leaf-dark: #4c9a49;
+  --wall: #f5efe3; --wall-shade: #dcd3c2; --door: #9b7653; --window: #cfe8f7;
+  --roof-1: #d96a4f; --roof-2: #4f86c6; --roof-3: #5aa36a; --roof-4: #c99a3d;
+}
+:root[data-theme='dark'] .stage {
+  --sky-top: #141a33; --sky-bottom: #3a3a66; --sun: #e9e4cf; --cloud: #4a4a76; --star-opacity: 0.85;
+  --hill-far: #233a35; --hill-near: #1d332b; --grass: #1f3a29; --path: #4a4034; --path-line: #5c503f;
+  --fence: #5a4a38; --trunk: #4a3a2a; --leaf: #24452e; --leaf-dark: #1c3a26;
+  --wall: #4a4a55; --wall-shade: #3a3a44; --door: #3a2d22; --window: #ffd36b;
+  --roof-1: #8a3f30; --roof-2: #2f4f7a; --roof-3: #2f5a3b; --roof-4: #7a5d25;
+}
+.town { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.town .stars { fill: #fff; opacity: var(--star-opacity); }
+.town .win { fill: var(--window); }
+:root[data-theme='dark'] .town .win { filter: drop-shadow(0 0 4px rgba(255, 211, 107, 0.7)); }
+.town .clouds { animation: drift 60s linear infinite alternate; }
+@keyframes drift { from { transform: translateX(-30px); } to { transform: translateX(40px); } }
+@media (prefers-reduced-motion: reduce) { .town .clouds { animation: none; } }
+
+.fighter { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .fighter .spot { height: 190px; width: 100%; display: flex; align-items: flex-end; justify-content: center; position: relative; }
 .fighter .spot::after {
   content: ''; position: absolute; bottom: -6px; width: 62%; height: 22px; border-radius: 50%;
@@ -37,7 +61,11 @@
 .plate .name { font-weight: 750; font-size: 16px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .hp { height: 8px; border-radius: 8px; background: var(--grid); overflow: hidden; margin-top: 8px; }
 .hp > div { height: 100%; border-radius: 8px; transition: width 0.45s ease-out, background 0.3s; }
-.vs { z-index: 1; align-self: center; text-align: center; }
+.vs {
+  position: relative; z-index: 2; align-self: center; text-align: center; padding: 14px 12px; border-radius: 16px;
+  background: color-mix(in srgb, var(--surface-1) 80%, transparent); border: 1px solid var(--border);
+  backdrop-filter: blur(6px); box-shadow: var(--shadow);
+}
 .vs-badge { font-size: 13px; font-family: var(--mono); color: var(--text-muted); letter-spacing: 0.2em; }
 .narration { min-height: 26px; text-align: center; font-size: 15px; font-weight: 600; margin-top: 14px; }
 .fight-btn { font-size: 17px; padding: 12px 34px; border-radius: 999px; margin-top: 10px; }
@@ -49,10 +77,6 @@
 .seg-bar > div { display: flex; align-items: center; padding: 0 8px; white-space: nowrap; transition: flex-basis 0.5s; min-width: 0; }
 .seg-bar > div:first-child { border-radius: 4px 0 0 4px; }
 .seg-bar > div:last-child { border-radius: 0 4px 4px 0; justify-content: flex-end; }
-.butterfly { display: grid; grid-template-columns: 1fr 64px 1fr; gap: 4px 8px; align-items: center; font-size: 13px; }
-.butterfly .bar { height: 14px; }
-.butterfly .l { display: flex; justify-content: flex-end; align-items: center; gap: 6px; }
-.butterfly .r { display: flex; align-items: center; gap: 6px; }
 @media (max-width: 700px) {
   .arena-pickers { grid-template-columns: 1fr; }
   .stage { grid-template-columns: 1fr 1fr; padding: 16px; }

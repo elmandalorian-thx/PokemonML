@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Art, Callout, Chapter, Code, StatBars, Types } from '../components/ui'
+import { Legend, Radar } from '../components/charts'
+import { Art, Callout, Chapter, Code, Types } from '../components/ui'
 import { playCry } from '../lib/assets'
-import { byName, fmt, getPokemon, guide, pct } from '../lib/data'
+import { byName, fmt, getPokemon, guide, pct, STAT_MEANS, STAT_SHORT } from '../lib/data'
 import type { Pokemon } from '../lib/types'
 
 const FILES = [
@@ -131,7 +132,15 @@ function PokemonDetail({ p }: { p: Pokemon }) {
         <span className="mono muted" style={{ fontSize: 12 }}>#{p.id} · Gen {p.gen}{p.legendary ? ' · Legendary' : ''}</span>
       </div>
       <Types types={p.types} />
-      <div style={{ margin: '14px 0' }}><StatBars p={p} highlight={5} /></div>
+      <div style={{ margin: '10px 0 4px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Radar size={250} max={Math.max(150, Math.ceil(Math.max(...p.stats) / 50) * 50)} axes={STAT_SHORT}
+          axisNote={(i) => String(p.stats[i])}
+          series={[
+            { key: 'avg', label: 'Average Pokémon', color: 'var(--text-muted)', values: STAT_MEANS, outline: true },
+            { key: 'p', label: p.name, color: 'var(--series-1)', values: p.stats },
+          ]} />
+        <Legend items={[{ label: p.name, color: 'var(--series-1)' }, { label: 'Average Pokémon', color: 'var(--text-muted)', line: true }]} />
+      </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, borderTop: '1px solid var(--grid)', paddingTop: 10 }}>
         <span className="muted">Total {p.total}</span>
         {p.games ? <span><strong>{pct(p.winRate!)}</strong> <span className="muted">won · {p.wins}/{p.games} battles</span></span> : <span className="muted">Never fought</span>}

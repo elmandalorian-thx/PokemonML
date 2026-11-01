@@ -2,8 +2,8 @@
 .venv/
 __pycache__/
 
-# Downloaded inputs (re-fetch with ml/fetch_data.py)
-data/raw/
+# data/raw/ (the Kaggle CSVs, CC0) IS committed.
+# PokeAPI id list (re-fetch with ml/fetch_data.py) and local outputs are not.
 data/external/
 data/output/
 

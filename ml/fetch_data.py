@@ -1,11 +1,13 @@
-"""Download the raw inputs (not committed to git).
+"""Download inputs.
 
-  data/raw/*.csv                      Kaggle "Pokemon Challenge" (terminus7)
-  data/external/pokeapi_pokemon.json  PokeAPI name -> id list (for sprite/cry URLs)
+  data/external/pokeapi_pokemon.json  PokeAPI name -> id list (for sprite/cry URLs), not committed
+  data/raw/*.csv                      Kaggle "Pokemon - Weedle's Cave" (terminus7, CC0). Already committed;
+                                      re-downloaded only with --kaggle
 
 Run:  .venv/Scripts/python.exe ml/fetch_data.py
 """
 import io
+import sys
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -22,15 +24,16 @@ def get(url: str) -> bytes:
 
 
 def main() -> None:
-    raw = ROOT / "data" / "raw"
-    raw.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(io.BytesIO(get(KAGGLE))) as z:
-        for name in ("pokemon.csv", "combats.csv", "tests.csv"):
-            (raw / name).write_bytes(z.read(name))
+    if "--kaggle" in sys.argv:
+        raw = ROOT / "data" / "raw"
+        raw.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(io.BytesIO(get(KAGGLE))) as z:
+            for name in ("pokemon.csv", "combats.csv", "tests.csv"):
+                (raw / name).write_bytes(z.read(name))
     ext = ROOT / "data" / "external"
     ext.mkdir(parents=True, exist_ok=True)
     (ext / "pokeapi_pokemon.json").write_bytes(get(POKEAPI))
-    print("Downloaded data/raw/*.csv and data/external/pokeapi_pokemon.json")
+    print("Downloaded data/external/pokeapi_pokemon.json")
 
 
 if __name__ == "__main__":

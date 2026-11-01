@@ -92,7 +92,7 @@ export function BarList({ items, format, domain, reference, labelWidth = 200, em
   const x = linear(d0, d1, 0, Math.max(40, width - lw - valueW))
   const h = items.length * row + 24
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="chart" style={{ position: 'relative' }}>
       <svg width={width} height={h} role="img">
         {ticks(d0, d1, 4).map((t) => (
           <g key={t} transform={`translate(${lw + x(t)},0)`}>
@@ -141,7 +141,7 @@ export function DivergingBars({ items, format, leftLabel, rightLabel }: {
   const cx = lw + half
   const x = linear(0, max, 0, half - 52) // leave room for the value label
   return (
-    <div ref={ref}>
+    <div ref={ref} className="chart">
       <svg width={width} height={items.length * row + 26}>
         <text x={cx - 8} y={12} textAnchor="end">← {leftLabel}</text>
         <text x={cx + 8} y={12}>{rightLabel} →</text>
@@ -188,7 +188,7 @@ export function LineChart({ series, xFormat, yFormat, yDomain, logX, height = 28
   const xTicks = logX ? xs : ticks(Math.min(...xs), Math.max(...xs), 6)
   const nearest = hx === null ? null : xs.reduce((best, v) => (Math.abs(X(v) - hx) < Math.abs(X(best) - hx) ? v : best), xs[0])
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="chart" style={{ position: 'relative' }}>
       <svg width={width} height={height}
         onMouseMove={(e) => setHx(e.clientX - e.currentTarget.getBoundingClientRect().left)}
         onMouseLeave={() => setHx(null)}>
@@ -235,6 +235,88 @@ export function LineChart({ series, xFormat, yFormat, yDomain, logX, height = 28
             <div key={s.key} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <i style={{ width: 8, height: 8, borderRadius: 4, background: s.color, display: 'inline-block' }} />
               {s.label} <b className="tabular" style={{ marginLeft: 'auto' }}>{yFormat(s.points.find((q) => q.x === nearest)!.y)}</b>
+            </div>
+          ))}
+        </Tooltip>
+      )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------ radar (spider) chart */
+
+export interface RadarSeries { key: string; label: string; color: string; values: number[]; outline?: boolean }
+
+/** Stat-profile radar. Rings are hairlines; series are 2px outlines with a light wash.
+ *  Hovering a spoke shows every series' value on that axis. */
+export function Radar({ series, axes, max, size = 260, compact = false, axisNote }: {
+  series: RadarSeries[]; axes: string[]; max: number; size?: number; compact?: boolean
+  /** extra text under each axis label, e.g. the values */
+  axisNote?: (i: number) => string
+}) {
+  const [hover, setHover] = useState<number | null>(null)
+  const pad = compact ? 22 : axisNote ? 44 : 34
+  const r = size / 2 - pad
+  const c = size / 2
+  const n = axes.length
+  const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
+  const pt = (i: number, v: number) => {
+    const k = (Math.min(v, max) / max) * r
+    return [c + k * Math.cos(angle(i)), c + k * Math.sin(angle(i))] as const
+  }
+  const poly = (vals: number[]) => vals.map((v, i) => pt(i, v).join(',')).join(' ')
+  const onMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const b = e.currentTarget.getBoundingClientRect()
+    const a = Math.atan2(e.clientY - b.top - c, e.clientX - b.left - c)
+    let best = 0, bd = Infinity
+    for (let i = 0; i < n; i++) {
+      const d = Math.abs(Math.atan2(Math.sin(a - angle(i)), Math.cos(a - angle(i))))
+      if (d < bd) { bd = d; best = i }
+    }
+    setHover(best)
+  }
+  const [hx, hy] = hover === null ? [0, 0] : pt(hover, max * 0.62)
+  return (
+    <div className="chart" style={{ position: 'relative', width: size, maxWidth: '100%' }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ maxWidth: '100%', height: 'auto' }}
+        onMouseMove={onMove} onMouseLeave={() => setHover(null)} role="img"
+        aria-label={series.map((s) => `${s.label}: ${axes.map((a, i) => `${a} ${Math.round(s.values[i])}`).join(', ')}`).join('; ')}>
+        {[0.25, 0.5, 0.75, 1].map((f) => (
+          <polygon key={f} points={poly(axes.map(() => max * f))} fill="none" className="gridline" />
+        ))}
+        {axes.map((_, i) => {
+          const [x, y] = pt(i, max)
+          return <line key={i} x1={c} y1={c} x2={x} y2={y} className={hover === i ? 'axisline' : 'gridline'} strokeWidth={hover === i ? 1.5 : 1} />
+        })}
+        {series.map((s) => (
+          <g key={s.key}>
+            <polygon points={poly(s.values)} fill={s.outline ? 'none' : s.color} fillOpacity={0.14}
+              stroke={s.color} strokeWidth={s.outline ? 1.5 : 2} strokeLinejoin="round" />
+            {!compact && !s.outline && s.values.map((v, i) => {
+              const [x, y] = pt(i, v)
+              return <circle key={i} cx={x} cy={y} r={hover === i ? 5 : 3.5} fill={s.color} stroke="var(--surface-1)" strokeWidth={2} />
+            })}
+          </g>
+        ))}
+        {axes.map((a, i) => {
+          const [x, y] = pt(i, max * (1 + (compact ? 0.2 : 0.18)))
+          const anchor = Math.abs(Math.cos(angle(i))) < 0.3 ? 'middle' : Math.cos(angle(i)) > 0 ? 'start' : 'end'
+          return (
+            <text key={a} x={x} y={y + 4} textAnchor={anchor} className={compact ? undefined : 'label'}
+              style={{ fontSize: compact ? 9.5 : 12, fontWeight: hover === i ? 700 : undefined }}>
+              {a}
+              {axisNote && <tspan x={x} dy={14} className="value" style={{ fontSize: 11.5 }}>{axisNote(i)}</tspan>}
+            </text>
+          )
+        })}
+      </svg>
+      {hover !== null && !compact && (
+        <Tooltip x={hx} y={hy}>
+          <div className="muted">{axes[hover]}</div>
+          {series.map((s) => (
+            <div key={s.key} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <i style={{ width: 8, height: 8, borderRadius: 4, background: s.color, display: 'inline-block' }} />
+              {s.label} <b className="tabular" style={{ marginLeft: 'auto' }}>{Math.round(s.values[hover])}</b>
             </div>
           ))}
         </Tooltip>

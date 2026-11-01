@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { BarList, ChartFrame, Legend, linear, ticks, Tooltip, useWidth } from '../components/charts'
-import { Art, Callout, Chapter, Code, StatTile } from '../components/ui'
-import { fmt, guide, pct, STAT_NAMES } from '../lib/data'
+import { BarList, ChartFrame, Legend, linear, Radar, ticks, Tooltip, useWidth } from '../components/charts'
+import { Art, Callout, Chapter, Code, StatTile, TypeBadge } from '../components/ui'
+import { fmt, guide, pct, STAT_MEANS, STAT_NAMES, STAT_SHORT } from '../lib/data'
 import type { Pokemon } from '../lib/types'
 
 const fought = guide.pokemon.filter((p) => p.winRate !== null)
@@ -51,6 +51,7 @@ export function Explore() {
         <StatTile label="First Pokémon wins" value={pct(guide.counts.firstWins)} note="position seems to matter a little" />
         <StatTile label="Speed ties won by the 1st" value={pct(guide.ties.firstWinsOnTies)} note={`all ${fmt(guide.ties.ties)} tied battles went to the 2nd`} />
       </div>
+      <TypeShapes />
       <Callout kind="pitfall" title="Correlation, confounding">
         Legendaries win far more often, but they are also much faster on average. Is it “being legendary” or just Speed?
         A good model, plus the importance checks in chapter 07, can tell these apart. Raw EDA cannot.
@@ -90,7 +91,7 @@ function Scatter({ stat }: { stat: string }) {
     setHover(best)
   }
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="chart" style={{ position: 'relative' }}>
       <Legend items={[{ label: 'Regular', color: 'var(--series-1)' }, { label: 'Legendary', color: 'var(--series-2)' }]} />
       <svg width={width} height={height} onMouseMove={onMove} onMouseLeave={() => setHover(null)} role="img" aria-label={`Scatter of win rate against ${stat}`}>
         {ticks(0, 1, 4).map((t) => (
@@ -113,6 +114,69 @@ function Scatter({ stat }: { stat: string }) {
           </div>
         </Tooltip>
       )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------ type profiles (small multiples) */
+
+const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length
+const typeProfiles = guide.typeChart.types.map((type) => {
+  const members = guide.pokemon.filter((p) => p.types.includes(type))
+  const rated = members.filter((p) => p.winRate !== null)
+  return {
+    type, count: members.length,
+    stats: STAT_NAMES.map((_, i) => mean(members.map((p) => p.stats[i]))),
+    winRate: mean(rated.map((p) => p.winRate!)),
+  }
+}).sort((a, b) => b.winRate - a.winRate)
+
+function pearson(x: number[], y: number[]) {
+  const mx = mean(x), my = mean(y)
+  const cov = x.reduce((s, xi, i) => s + (xi - mx) * (y[i] - my), 0)
+  return cov / Math.sqrt(x.reduce((s, xi) => s + (xi - mx) ** 2, 0) * y.reduce((s, yi) => s + (yi - my) ** 2, 0))
+}
+const typeSpeedR = pearson(typeProfiles.map((t) => t.stats[5]), typeProfiles.map((t) => t.winRate))
+const radarMax = Math.ceil(Math.max(...typeProfiles.flatMap((t) => t.stats)) / 10) * 10
+
+function TypeShapes() {
+  const best = typeProfiles[0], worst = typeProfiles[typeProfiles.length - 1]
+  return (
+    <div className="block">
+      <h3>Every type has a shape</h3>
+      <p>Average the six stats of every Pokémon of a type and draw them as a radar chart: Fighting leans on Attack, Psychic on the special stats,
+        Steel and Rock on Defense. Sorted by win rate, a pattern jumps out. The types that win most ({best.type}, {typeProfiles[1].type}, {typeProfiles[2].type})
+        have Speed spikes; the types that lose most ({worst.type}, {typeProfiles[typeProfiles.length - 2].type}) are slow. Across the 18 types, average Speed
+        and win rate correlate at <strong>r = {typeSpeedR.toFixed(2)}</strong>.</p>
+      <div className="card">
+        <Legend items={[{ label: 'Type average', color: 'var(--series-1)' }, { label: 'All Pokémon average', color: 'var(--text-muted)', line: true }]} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px 8px' }}>
+          {typeProfiles.map((t, i) => (
+            <div key={t.type} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12 }}>
+                <span className="mono muted">{i + 1}</span><TypeBadge type={t.type} />
+              </div>
+              <div className="muted tabular" style={{ fontSize: 12 }}>wins {pct(t.winRate, 0)} · Spe {Math.round(t.stats[5])}</div>
+              <Radar compact size={150} max={radarMax} axes={STAT_SHORT}
+                series={[
+                  { key: 'all', label: 'All Pokémon', color: 'var(--text-muted)', values: STAT_MEANS, outline: true },
+                  { key: t.type, label: t.type, color: 'var(--series-1)', values: t.stats },
+                ]} />
+            </div>
+          ))}
+        </div>
+        <details className="table-view">
+          <summary>View as table</summary>
+          <table className="data-table">
+            <thead><tr><th>Type</th><th className="num">Pokémon</th><th className="num">Win rate</th>{STAT_SHORT.map((s) => <th key={s} className="num">{s}</th>)}</tr></thead>
+            <tbody>{typeProfiles.map((t) => (
+              <tr key={t.type}><td>{t.type}</td><td className="num">{t.count}</td><td className="num">{pct(t.winRate)}</td>
+                {t.stats.map((v, i) => <td key={i} className="num">{v.toFixed(0)}</td>)}</tr>
+            ))}</tbody>
+          </table>
+        </details>
+      </div>
+      <p className="muted" style={{ fontSize: 14 }}>Idea from Diego Rosa's exploratory analysis of the same dataset (see Credits). Dual-type Pokémon count toward both of their types.</p>
     </div>
   )
 }

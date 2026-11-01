@@ -27,7 +27,9 @@ runs the exported models in the browser (the "arena").
 ml/fetch_data.py -> data/raw/*.csv, data/external/pokeapi_pokemon.json   (gitignored)
 ml/build.py      -> web/src/data/guide.json      (bundled: metrics, chart data, models, pokemon)
                  -> web/public/data/battles.json (fetched lazily: head-to-head records)
-                 -> web/public/data/submission.csv
+                 -> data/output/submission.csv   (local only)
+data/raw/*.csv   committed; served at /data/kaggle/ by the kaggleData() plugin in web/vite.config.ts
+notebooks/pokemon_battle_ml.ipynb  same pipeline as a commented notebook (cites Géron, HOML 3rd ed. by section title only)
 web/src/lib/model.ts mirrors ml/build.py features + inference (logreg, depth-3 tree, GBM trees)
 ```
 
@@ -41,10 +43,11 @@ web/src/lib/model.ts mirrors ml/build.py features + inference (logreg, depth-3 t
 
 | File | What to reuse |
 |------|---------------|
-| `components/charts.tsx` | `ChartFrame` (title/legend/table view), `BarList`, `DivergingBars`, `LineChart`, `Legend`, `Tooltip`, `useWidth`, `linear`, `ticks`, `barPath` |
+| `components/charts.tsx` | `ChartFrame` (title/legend/table view), `BarList`, `DivergingBars`, `LineChart`, `Radar`, `Legend`, `Tooltip`, `useWidth`, `linear`, `ticks`, `barPath`. Every chart root needs `className="chart"` (dark-mode text) |
+| `components/TownBackdrop.tsx` | Arena scene; colors are CSS vars on `.stage` in `arena.css` (day / dusk) |
 | `components/ui.tsx` | `Chapter`, `Callout` (concept/pitfall/result/try), `Code`, `StatTile`, `TypeBadge`/`Types`, `Art` (sprite w/ fallbacks), `StatBars`, `PokemonPicker` |
 | `components/TreeDiagram.tsx` | Depth-3 tree diagram with optional highlighted `path` |
-| `lib/data.ts` | `guide`, `getPokemon`, `byName`, `headToHead`, `pct`, `fmt` |
+| `lib/data.ts` | `guide`, `getPokemon`, `byName`, `headToHead`, `pct`, `fmt`, `STAT_NAMES`, `STAT_SHORT`, `STAT_MEANS` |
 | `lib/model.ts` | `pairFeatures`, `predictAll`, `logreg`, `tree`, `gbm`, `featureLabel` |
 | `lib/assets.ts` | `sprite.small/art/animated`, `playCry`, `fallbackChain` |
 
@@ -61,8 +64,10 @@ web/src/lib/model.ts mirrors ml/build.py features + inference (logreg, depth-3 t
 
 ```
 ml/            build.py (pipeline), type_chart.py, fetch_data.py, requirements.txt
+data/raw/      Kaggle CSVs (committed, CC0)
+notebooks/     pokemon_battle_ml.ipynb
 web/src/       App.tsx, index.css, lib/, components/, sections/ (one file per chapter group), data/guide.json
-web/public/    favicon.svg, data/battles.json, data/submission.csv
+web/public/    favicon.svg, data/battles.json
 docs/          CHANGELOG.md
 ```
 
@@ -71,7 +76,8 @@ docs/          CHANGELOG.md
 - Train on the original battle orientation. Swap-augmentation is kept only as a measured experiment (it erases the speed-tie rule).
 - Charts: thin marks, hairline solid grid, legend for 2+ series, hover tooltip, table view. No dual axes.
 - Text never uses series colors; identity comes from swatches.
-- Keep sprites/cries hot-linked; every `<img>` needs a `fallbackChain`.
+- Keep sprites/cries hot-linked; every `<img>` needs a `fallbackChain`. Arena art stays original (no copied game assets).
+- Never add the HOML PDF or book text to the repo; cite chapter/section titles only.
 - Test the arena with the presets (speed tie + Swap must flip the winner).
 
 ## References

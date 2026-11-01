@@ -20,9 +20,15 @@ export function Hero() {
             problem to cleaning, exploring, feature engineering, baselines, models and evaluation, and then puts the
             trained model in the arena so you can test it yourself.
           </p>
+          <p style={{ fontSize: 14, marginTop: -4 }}>
+            By <a href="https://github.com/elmandalorian-thx" target="_blank" rel="noreferrer"><strong>Juan Barahona</strong></a> ·
+            Data: <a href="https://www.kaggle.com/datasets/terminus7/pokemon-challenge" target="_blank" rel="noreferrer">Kaggle “Pokemon – Weedle’s Cave”</a> by
+            T7 – Hackathon Challenge (CC0) · Method: Géron, <em>Hands-On Machine Learning</em> (3rd ed.)
+          </p>
           <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
             <a className="btn btn-primary" href="#problem" style={{ textDecoration: 'none' }}>Start the walkthrough</a>
             <a className="btn" href="#arena" style={{ textDecoration: 'none' }}>Skip to the arena →</a>
+            <a className="btn" href="#notebook" style={{ textDecoration: 'none' }}>Notebook & data</a>
           </div>
         </div>
         <div className="hero-art" aria-hidden>

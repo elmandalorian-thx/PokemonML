@@ -9,6 +9,8 @@ export const byName = (name: string) => guide.pokemon.find((p) => p.name === nam
 
 export const STAT_NAMES = ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed']
 export const STAT_SHORT = ['HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe']
+/** Average of each stat over all Pokémon (the outline in every radar). */
+export const STAT_MEANS = STAT_NAMES.map((_, i) => guide.pokemon.reduce((s, p) => s + p.stats[i], 0) / guide.pokemon.length)
 
 /** Head-to-head records ("lo-hi" -> [wins by lo, wins by hi]), fetched once on demand. */
 let battles: Promise<Record<string, [number, number]>> | null = null

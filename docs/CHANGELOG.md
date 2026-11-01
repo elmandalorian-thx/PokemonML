@@ -2,6 +2,12 @@
 
 ## 2026-11-01
 
+- Radar charts (`Radar` in charts.tsx): 18 type profiles in Explore (avg Speed vs win rate r = 0.96), Pokédex detail, arena A-vs-B matchup (replaces the stat butterfly)
+- Arena backdrop: original SVG village, day in light mode and dusk in dark mode (`components/TownBackdrop.tsx`)
+- Jupyter notebook `notebooks/pokemon_battle_ml.ipynb`: full pipeline, commented and mapped to Géron's *Hands-On ML* (3rd ed.)
+- Kaggle CSVs committed in `data/raw/` and downloadable from the site (`kaggleData` Vite plugin); credits for Kaggle/T7, the book, Diego Rosa's article
+- Removed the submission.csv download (it is still written locally to `data/output/`)
+- Fixed dark-mode chart labels rendering black (all chart roots carry `.chart`)
 - Initial ML pipeline `ml/build.py`: cleaning, 11 pair features (stat diffs, type advantage, physical/special edge), baselines, logistic regression, depth-3 tree, gradient boosting (95.1% test accuracy)
 - Experiments exported for the guide: overfitting curve, learning curve, permutation importance, ablation, leakage, group split, swap-augmentation (hurts: 93.7%), "is faster" step feature (logreg 88.2% → 94.6%)
 - Found the simulator rule that speed ties always go to the second Pokémon
