@@ -44,7 +44,7 @@ web/src/lib/model.ts mirrors ml/build.py features + inference (logreg, depth-3 t
 | File | What to reuse |
 |------|---------------|
 | `components/charts.tsx` | `ChartFrame` (title/legend/table view), `BarList`, `DivergingBars`, `LineChart`, `Radar`, `Legend`, `Tooltip`, `useWidth`, `linear`, `ticks`, `barPath`. Every chart root needs `className="chart"` (dark-mode text) |
-| `components/TownBackdrop.tsx` | Arena scene; colors are CSS vars on `.stage` in `arena.css` (day / dusk) |
+| `components/ForestBackdrop.tsx` | Arena forest scene; colors are CSS vars on `.stage` in `arena.css` (day / dusk) |
 | `components/ui.tsx` | `Chapter`, `Callout` (concept/pitfall/result/try), `Code`, `StatTile`, `TypeBadge`/`Types`, `Art` (sprite w/ fallbacks), `StatBars`, `PokemonPicker` |
 | `components/TreeDiagram.tsx` | Depth-3 tree diagram with optional highlighted `path` |
 | `lib/data.ts` | `guide`, `getPokemon`, `byName`, `headToHead`, `pct`, `fmt`, `STAT_NAMES`, `STAT_SHORT`, `STAT_MEANS` |

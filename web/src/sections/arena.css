@@ -10,28 +10,28 @@
   opacity: 0.22;
 }
 
-/* ---- town backdrop: day in light mode, dusk in dark mode */
+/* ---- forest backdrop: day in light mode, dusk in dark mode */
 .stage {
-  --sky-top: #a9d8f5; --sky-bottom: #e6f4fb; --sun: #ffd76a; --cloud: #ffffff; --star-opacity: 0;
-  --hill-far: #b5dcae; --hill-near: #9acf8e; --grass: #8cc97b; --path: #e9d7a8; --path-line: #d5bf88;
-  --fence: #c9a878; --trunk: #8a6a4a; --leaf: #5fae5a; --leaf-dark: #4c9a49;
-  --wall: #f5efe3; --wall-shade: #dcd3c2; --door: #9b7653; --window: #cfe8f7;
-  --roof-1: #d96a4f; --roof-2: #4f86c6; --roof-3: #5aa36a; --roof-4: #c99a3d;
+  --sky-top: #a9d8f5; --sky-bottom: #e6f4fb; --sun: #ffd76a; --cloud: #ffffff; --star-opacity: 0; --firefly-opacity: 0;
+  --hill-far: #b5dcae; --hill-near: #9acf8e; --grass: #8cc97b; --path: #e9d7a8; --path-line: #d5bf88; --trunk: #8a6a4a;
+  --leaf: #5fae5a; --leaf-dark: #4c9a49; --leaf-light: #8fd17f; --leaf-far: #93c98a; --leaf-far-dark: #84bd7c;
+  --pine: #3f9a62; --pine-dark: #348455;
 }
 :root[data-theme='dark'] .stage {
-  --sky-top: #141a33; --sky-bottom: #3a3a66; --sun: #e9e4cf; --cloud: #4a4a76; --star-opacity: 0.85;
-  --hill-far: #233a35; --hill-near: #1d332b; --grass: #1f3a29; --path: #4a4034; --path-line: #5c503f;
-  --fence: #5a4a38; --trunk: #4a3a2a; --leaf: #24452e; --leaf-dark: #1c3a26;
-  --wall: #4a4a55; --wall-shade: #3a3a44; --door: #3a2d22; --window: #ffd36b;
-  --roof-1: #8a3f30; --roof-2: #2f4f7a; --roof-3: #2f5a3b; --roof-4: #7a5d25;
+  --sky-top: #141a33; --sky-bottom: #3a3a66; --sun: #e9e4cf; --cloud: #4a4a76; --star-opacity: 0.85; --firefly-opacity: 1;
+  --hill-far: #233a35; --hill-near: #1d332b; --grass: #1f3a29; --path: #4a4034; --path-line: #5c503f; --trunk: #4a3a2a;
+  --leaf: #24452e; --leaf-dark: #1c3a26; --leaf-light: #2f5a3a; --leaf-far: #2a4038; --leaf-far-dark: #243832;
+  --pine: #1f4430; --pine-dark: #193a28;
 }
-.town { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-.town .stars { fill: #fff; opacity: var(--star-opacity); }
-.town .win { fill: var(--window); }
-:root[data-theme='dark'] .town .win { filter: drop-shadow(0 0 4px rgba(255, 211, 107, 0.7)); }
-.town .clouds { animation: drift 60s linear infinite alternate; }
+.backdrop { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.backdrop .stars { fill: #fff; opacity: var(--star-opacity); }
+.backdrop .fireflies { fill: #ffe37a; opacity: var(--firefly-opacity); filter: drop-shadow(0 0 4px rgba(255, 227, 122, 0.9)); }
+.backdrop .fireflies circle { animation: glow 3s ease-in-out infinite alternate; }
+.backdrop .fireflies circle:nth-child(odd) { animation-delay: -1.5s; }
+.backdrop .clouds { animation: drift 60s linear infinite alternate; }
 @keyframes drift { from { transform: translateX(-30px); } to { transform: translateX(40px); } }
-@media (prefers-reduced-motion: reduce) { .town .clouds { animation: none; } }
+@keyframes glow { from { opacity: 0.25; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .backdrop .clouds, .backdrop .fireflies circle { animation: none; } }
 
 .fighter { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .fighter .spot { height: 190px; width: 100%; display: flex; align-items: flex-end; justify-content: center; position: relative; }

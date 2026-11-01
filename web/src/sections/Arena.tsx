@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { DivergingBars, Legend, Radar } from '../components/charts'
-import { TownBackdrop } from '../components/TownBackdrop'
+import { ForestBackdrop } from '../components/ForestBackdrop'
 import { TreeDiagram } from '../components/TreeDiagram'
 import { Art, Callout, Chapter, PokemonPicker, TYPE_COLORS, Types } from '../components/ui'
 import { fallbackChain, playCry, sprite } from '../lib/assets'
@@ -122,7 +122,7 @@ export function Arena() {
         {lesson && <div className="muted" style={{ fontSize: 14, marginTop: 10 }}>💡 {lesson}</div>}
 
         <div className="stage" style={{ ...tint, marginTop: 16 }}>
-          <TownBackdrop />
+          <ForestBackdrop />
           <Fighter p={a} side="A" hp={hp[0]} fx={fx} />
           <div className="vs">
             <div className="vs-badge">VS</div>

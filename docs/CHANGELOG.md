@@ -2,8 +2,8 @@
 
 ## 2026-11-01
 
+- Arena backdrop is now a cartoon forest clearing (tree layers, bushes, fireflies at dusk) instead of a village (`components/ForestBackdrop.tsx`)
 - Radar charts (`Radar` in charts.tsx): 18 type profiles in Explore (avg Speed vs win rate r = 0.96), Pokédex detail, arena A-vs-B matchup (replaces the stat butterfly)
-- Arena backdrop: original SVG village, day in light mode and dusk in dark mode (`components/TownBackdrop.tsx`)
 - Jupyter notebook `notebooks/pokemon_battle_ml.ipynb`: full pipeline, commented and mapped to Géron's *Hands-On ML* (3rd ed.)
 - Kaggle CSVs committed in `data/raw/` and downloadable from the site (`kaggleData` Vite plugin); credits for Kaggle/T7, the book, Diego Rosa's article
 - Removed the submission.csv download (it is still written locally to `data/output/`)
