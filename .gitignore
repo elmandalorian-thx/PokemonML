@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+
+# Downloaded inputs (re-fetch with ml/fetch_data.py)
+data/raw/
+data/external/
+data/output/
+
+# Web
+web/node_modules/
+web/dist/
+*.log
+.DS_Store
